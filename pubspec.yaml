@@ -1,0 +1,82 @@
+name: daishin_order_app
+description: "DAISHIN Order System - Mobile ordering application with multi-language support and manual payment methods"
+publish_to: "none"
+version: 1.0.0+10
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.1
+
+  # Routing
+  go_router: ^13.0.0
+
+  # HTTP & API
+  dio: ^5.4.0
+  http: ^1.1.0
+
+  # Storage
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+
+  # Internationalization
+  intl: ^0.20.2
+
+  # UI/UX
+  cached_network_image: ^3.3.0
+  image_picker: ^1.0.5
+  file_picker: ^8.0.0
+
+  # Utilities
+  connectivity_plus: ^5.0.2
+  flutter_dotenv: ^5.1.0
+  share_plus: ^7.2.1
+
+  # Cupertino Icons
+  cupertino_icons: ^1.0.2
+  fuzzy: ^0.5.1
+  marquee: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/products/
+    - assets/icons/
+    - assets/translations/
+    - .env
+
+  # Noto Sans Font (supports English, Khmer, Japanese, Chinese)
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSans-Bold.ttf
+          weight: 700
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/daishin_logo.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
