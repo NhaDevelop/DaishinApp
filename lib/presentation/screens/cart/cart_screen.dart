@@ -23,7 +23,9 @@ class CartScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
+        centerTitle: false,
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             AppBarLogo(
               onTap: () {
@@ -32,7 +34,12 @@ class CartScreen extends StatelessWidget {
               },
             ),
             const SizedBox(width: 8),
-            const Text('Shopping Cart'),
+            const Flexible(
+              child: Text(
+                'Shopping Cart',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [
