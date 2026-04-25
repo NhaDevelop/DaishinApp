@@ -171,7 +171,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   color: Colors.white,
                                   size: 24,
                                 ),
-                                onPressed: () => context.push(RouteNames.cart),
+                                onPressed: () => context.go(RouteNames.cart),
                               ),
                               if (itemCount > 0)
                                 Positioned(
@@ -882,7 +882,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             width: double.infinity,
                             height: 48,
                             child: ElevatedButton(
-                              onPressed: () => context.push(RouteNames.cart),
+                              onPressed: () => context.go(RouteNames.cart),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
                                 foregroundColor: Colors.white,
