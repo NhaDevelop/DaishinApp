@@ -10,6 +10,7 @@ import '../../widgets/common/app_logo.dart';
 import '../../../utils/formatters.dart';
 import '../../../data/models/product_model.dart';
 import '../../widgets/common/top_snackbar.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -200,7 +201,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 },
                 child: favoritesProvider.isLoading &&
                         favoritesProvider.favoriteProducts.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const HomeProductGridSkeleton(itemCount: 6)
                     : displayProducts.isEmpty
                         ? Center(
                             child: SingleChildScrollView(
@@ -449,8 +450,11 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                   top: 4,
                   right: 4,
                   child: GestureDetector(
-                    onTap: () =>
-                        favoritesProvider.toggleFavorite(widget.product),
+                    onTap: () {
+                      final isFavorite = favoritesProvider.isFavorite(widget.product.id);
+                      favoritesProvider.toggleFavorite(widget.product);
+                      TopSnackBar.show(context, isFavorite ? 'Removed from favorites' : 'Added to favorites');
+                    },
                     behavior: HitTestBehavior.opaque,
                     child: Container(
                       padding: const EdgeInsets.all(5),

@@ -12,6 +12,7 @@ import '../../widgets/product/product_card.dart';
 import '../../../core/routes/route_names.dart';
 import '../../../utils/formatters.dart';
 import '../../widgets/common/app_logo.dart';
+import '../../widgets/common/skeleton_loader.dart';
 import '../../widgets/common/top_snackbar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -304,9 +305,10 @@ class _HomeScreenState extends State<HomeScreen>
       {bool isBold = false}) {
     return ListTile(
       onTap: () {
-        provider.filterByCategory(id);
+        final router = GoRouter.of(context);
         Navigator.pop(context);
-        context.go('${RouteNames.home}/browse');
+        provider.filterByCategory(id);
+        router.go('${RouteNames.home}/browse');
       },
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: Icon(icon, size: 22, color: Colors.grey[500]),
@@ -388,10 +390,10 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
             onTap: () {
-              provider.filterByCategory(categoryId);
+              final router = GoRouter.of(context);
               Navigator.pop(context);
-              // Navigate to product list screen
-              context.go('${RouteNames.home}/browse');
+              provider.filterByCategory(categoryId);
+              router.go('${RouteNames.home}/browse');
             },
           ),
 
@@ -411,10 +413,10 @@ class _HomeScreenState extends State<HomeScreen>
                           provider.selectedCategoryId == subCategory.id;
                       return InkWell(
                         onTap: () {
-                          provider.filterByCategory(subCategory.id);
+                          final router = GoRouter.of(context);
                           Navigator.pop(context);
-                          // Navigate to product list screen
-                          context.go('${RouteNames.home}/browse');
+                          provider.filterByCategory(subCategory.id);
+                          router.go('${RouteNames.home}/browse');
                         },
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
@@ -740,14 +742,7 @@ class _HomeScreenState extends State<HomeScreen>
                       child: Consumer<ProductProvider>(
                         builder: (context, provider, _) {
                           return provider.categoriesState.when(
-                            loading: () => const Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                            ),
+                            loading: () => const HomeCategoryRowSkeleton(),
                             error: (_) => const SizedBox(),
                             success: (categories) {
                               return ListView.builder(
@@ -1007,14 +1002,7 @@ class _HomeScreenState extends State<HomeScreen>
               Consumer<ProductProvider>(
                 builder: (context, productProvider, child) {
                   return productProvider.filteredProductsState.when(
-                    loading: () => const SliverToBoxAdapter(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ),
+                    loading: () => const ProductGridSkeleton(itemCount: 6),
                     error: (error) =>
                         const SliverToBoxAdapter(child: SizedBox()),
                     success: (products) {

@@ -8,6 +8,8 @@ import '../../providers/cart_provider.dart';
 import '../../../utils/formatters.dart';
 import '../../../core/routes/route_names.dart';
 import '../../widgets/common/app_logo.dart';
+import '../../widgets/common/top_snackbar.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -71,6 +73,9 @@ class CartScreen extends StatelessWidget {
 
                   if (confirm == true && context.mounted) {
                     await context.read<CartProvider>().clearCart();
+                    if (context.mounted) {
+                      TopSnackBar.show(context, 'Cart cleared');
+                    }
                   }
                 },
                 child: const Text(
@@ -128,9 +133,7 @@ class CartScreen extends StatelessWidget {
                 slivers: [
                   // Cart Content
                   cartProvider.cartState.when(
-                    loading: () => const SliverFillRemaining(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                    loading: () => const CartLoadingSkeleton(itemCount: 4),
                     error: (error) => SliverFillRemaining(
                       child: Center(
                           child: Text('Error: $error',
@@ -311,7 +314,10 @@ class CartScreen extends StatelessWidget {
                       ),
                       // Delete Icon
                       InkWell(
-                        onTap: () => cartProvider.removeItem(item.id),
+                        onTap: () {
+                          cartProvider.removeItem(item.id);
+                          TopSnackBar.show(context, 'Item removed from cart');
+                        },
                         borderRadius: BorderRadius.circular(20),
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),

@@ -158,8 +158,11 @@ class _ProductCardState extends State<ProductCard> {
                             final isFavorite =
                                 favoritesProvider.isFavorite(widget.product.id);
                             return GestureDetector(
-                              onTap: () => favoritesProvider
-                                  .toggleFavorite(widget.product),
+                              onTap: () {
+                                final isFavorite = favoritesProvider.isFavorite(widget.product.id);
+                                favoritesProvider.toggleFavorite(widget.product);
+                                TopSnackBar.show(context, isFavorite ? 'Removed from favorites' : 'Added to favorites');
+                              },
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(

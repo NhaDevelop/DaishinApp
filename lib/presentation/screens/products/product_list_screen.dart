@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fuzzy/fuzzy.dart';
 import '../../providers/product_provider.dart';
 import '../../widgets/common/app_logo.dart';
+import '../../widgets/common/skeleton_loader.dart';
 import '../../widgets/product/product_card.dart';
 
 import '../../../core/routes/route_names.dart';
@@ -185,66 +186,49 @@ class _ProductListScreenState extends State<ProductListScreen>
                                   onFieldSubmitted) {
                                 return Container(
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
+                                    color: Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
                                   ),
                                   child: TextField(
                                     controller: controller,
                                     focusNode: focusNode,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
-                                          ?.color,
-                                    ),
+                                    textInputAction: TextInputAction.search,
                                     decoration: InputDecoration(
                                       hintText: 'Search products...',
                                       hintStyle: TextStyle(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.color
-                                            ?.withOpacity(0.6),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withOpacity(0.6),
+                                          fontSize: 14),
+                                      prefixIcon: Icon(Icons.search,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withOpacity(0.6),
+                                          size: 22),
+                                      suffixIcon: IconButton(
+                                        icon: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).primaryColor,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(Icons.arrow_forward,
+                                              color: Colors.white, size: 16),
+                                        ),
+                                        onPressed: () {
+                                          final query = controller.text.trim();
+                                          if (query.isNotEmpty) {
+                                            productProvider.searchProducts(query);
+                                          } else {
+                                            productProvider.searchProducts('');
+                                          }
+                                        },
                                       ),
-                                      prefixIcon: Icon(
-                                        Icons.search,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.color
-                                            ?.withOpacity(0.6),
-                                      ),
-                                      suffixIcon: controller.text.isNotEmpty
-                                          ? IconButton(
-                                              icon: Icon(
-                                                Icons.close,
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.color
-                                                    ?.withOpacity(0.6),
-                                              ),
-                                              onPressed: () {
-                                                controller.clear();
-                                                productProvider
-                                                    .searchProducts('');
-                                              },
-                                            )
-                                          : null,
-                                      filled: false,
                                       border: InputBorder.none,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 12,
-                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
                                     ),
                                     onSubmitted: (value) {
                                       productProvider.searchProducts(value);
@@ -399,9 +383,7 @@ class _ProductListScreenState extends State<ProductListScreen>
 
             // Product Grid
             productProvider.filteredProductsState.when(
-              loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              loading: () => const ProductGridSkeleton(itemCount: 6),
               error: (error) => SliverFillRemaining(
                 child: Center(
                   child: Column(
@@ -534,122 +516,278 @@ class _ProductListScreenState extends State<ProductListScreen>
       success: (data) => categories.addAll(data),
     );
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Filter by Category'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // All Products option
-                ListTile(
-                  title: const Text(
-                    'All Products',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  leading: Radio<String?>(
-                    value: null,
-                    groupValue: productProvider.selectedCategoryId,
-                    onChanged: (value) {
-                      productProvider.filterByCategory(null);
-                      Navigator.pop(context);
-                    },
-                  ),
-                  onTap: () {
-                    productProvider.filterByCategory(null);
-                    Navigator.pop(context);
-                  },
-                ),
-                const Divider(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateSheet) {
+            String? selectedId = productProvider.selectedCategoryId;
 
-                // Categories with subcategories
-                ...categories.expand((category) {
-                  final items = <Widget>[];
+            void selectAndClose(String? id) {
+              Navigator.pop(ctx);
+              productProvider.filterByCategory(id);
+            }
 
-                  // Add main category
-                  items.add(
-                    ListTile(
-                      title: Text(
-                        category.name,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      leading: Radio<String?>(
-                        value: category.id,
-                        groupValue: productProvider.selectedCategoryId,
-                        onChanged: (value) {
-                          productProvider.filterByCategory(category.id);
-                          Navigator.pop(context);
-                        },
-                      ),
-                      onTap: () {
-                        productProvider.filterByCategory(category.id);
-                        Navigator.pop(context);
-                      },
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.75,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 4),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                  );
+                  ),
 
-                  // Add subcategories with indentation
-                  for (final subCategory in category.subCategories) {
-                    items.add(
-                      ListTile(
-                        contentPadding:
-                            const EdgeInsets.only(left: 32, right: 16),
-                        title: Row(
-                          children: [
-                            Icon(
-                              Icons.subdirectory_arrow_right,
-                              size: 16,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.5),
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.filter_list_rounded,
+                          color: Theme.of(context).primaryColor,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Filter by Category',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.color,
+                          ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Theme.of(context).primaryColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                subCategory.name,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.8),
-                                ),
+                          ),
+                          child: const Text(
+                            'Close',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Divider(
+                    height: 1,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.08),
+                  ),
+
+                  // Scrollable list
+                  Flexible(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      shrinkWrap: true,
+                      children: [
+                        // All Products option
+                        _buildFilterTile(
+                          context: context,
+                          label: 'All Products',
+                          isSelected: selectedId == null,
+                          isBold: true,
+                          onTap: () => selectAndClose(null),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        // Categories with subcategories
+                        ...categories.expand((category) {
+                          final items = <Widget>[];
+
+                          items.add(
+                            _buildFilterTile(
+                              context: context,
+                              label: category.name,
+                              isSelected: selectedId == category.id,
+                              isBold: true,
+                              onTap: () => selectAndClose(category.id),
+                            ),
+                          );
+
+                          for (final sub in category.subCategories) {
+                            items.add(
+                              _buildSubFilterTile(
+                                context: context,
+                                label: sub.name,
+                                isSelected: selectedId == sub.id,
+                                onTap: () => selectAndClose(sub.id),
                               ),
-                            ),
-                          ],
-                        ),
-                        leading: Radio<String?>(
-                          value: subCategory.id,
-                          groupValue: productProvider.selectedCategoryId,
-                          onChanged: (value) {
-                            productProvider.filterByCategory(subCategory.id);
-                            Navigator.pop(context);
-                          },
-                        ),
-                        onTap: () {
-                          productProvider.filterByCategory(subCategory.id);
-                          Navigator.pop(context);
-                        },
-                      ),
-                    );
-                  }
+                            );
+                          }
 
-                  return items;
-                }),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
+                          items.add(const SizedBox(height: 4));
+                          return items;
+                        }),
+
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
+    );
+  }
+
+  Widget _buildFilterTile({
+    required BuildContext context,
+    required String label,
+    required bool isSelected,
+    required bool isBold,
+    required VoidCallback onTap,
+  }) {
+    final primary = Theme.of(context).primaryColor;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.symmetric(vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? primary.withOpacity(0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(color: primary.withOpacity(0.35), width: 1.5)
+              : Border.all(color: Colors.transparent, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 15,
+                  color: isSelected
+                      ? primary
+                      : Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: primary, size: 20)
+            else
+              Icon(
+                Icons.radio_button_unchecked_rounded,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withOpacity(0.3),
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubFilterTile({
+    required BuildContext context,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final primary = Theme.of(context).primaryColor;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.only(left: 16, top: 2, bottom: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? primary.withOpacity(0.08)
+              : Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withOpacity(0.03),
+          borderRadius: BorderRadius.circular(10),
+          border: isSelected
+              ? Border.all(color: primary.withOpacity(0.3), width: 1)
+              : Border.all(color: Colors.transparent, width: 1),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.subdirectory_arrow_right_rounded,
+              size: 15,
+              color: isSelected
+                  ? primary.withOpacity(0.7)
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.35),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color: isSelected
+                      ? primary
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.75),
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: primary, size: 18)
+            else
+              Icon(
+                Icons.radio_button_unchecked_rounded,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withOpacity(0.25),
+                size: 18,
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

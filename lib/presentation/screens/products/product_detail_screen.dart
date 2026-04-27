@@ -152,7 +152,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             color: isFavorite ? Colors.red : Colors.white,
                             size: 24,
                           ),
-                          onPressed: () => favProvider.toggleFavorite(_product),
+                          onPressed: () {
+                            final isFavorite = favProvider.isFavorite(_product.id);
+                            favProvider.toggleFavorite(_product);
+                            TopSnackBar.show(context, isFavorite ? 'Removed from favorites' : 'Added to favorites');
+                          },
                         );
                       },
                     ),
@@ -824,38 +828,46 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
+                                  const EdgeInsets.symmetric(horizontal: 12),
                             ),
                             child: _product.stock > 0
                                 ? Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text(
-                                        'Add to Cart',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
+                                      const Flexible(
+                                        child: Text(
+                                          'Add to Cart',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
+                                      const SizedBox(width: 4),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 4),
+                                            horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.2),
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
-                                        child: Text(
-                                          Formatters.formatCurrency(
-                                              (_product.hasDiscount
-                                                      ? _product.finalPrice
-                                                      : _product.price) *
-                                                  _quantity),
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.white,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            Formatters.formatCurrency(
+                                                (_product.hasDiscount
+                                                        ? _product.finalPrice
+                                                        : _product.price) *
+                                                    _quantity),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                       ),
