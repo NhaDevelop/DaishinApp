@@ -131,12 +131,12 @@ class ProductCardSkeleton extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image placeholder (square)
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
             child: AspectRatio(
               aspectRatio: 1.0,
               child: SkeletonBox(
@@ -149,22 +149,22 @@ class ProductCardSkeleton extends StatelessWidget {
           // Details area
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title
                   SkeletonBox(width: double.infinity, height: 14, radius: 6),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   // Price row
                   Row(
                     children: [
                       SkeletonBox(width: 60, height: 13, radius: 6),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       SkeletonBox(width: 40, height: 11, radius: 6),
                     ],
                   ),
-                  const Spacer(),
+                  Spacer(),
                   // Add-to-cart button
                   SkeletonBox(
                     width: double.infinity,
@@ -255,13 +255,13 @@ class HomeCategoryRowSkeleton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           physics: const NeverScrollableScrollPhysics(),
           children: List.generate(6, (_) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 16),
+            return const Padding(
+              padding: EdgeInsets.only(right: 16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SkeletonCircle(size: 56),
-                  const SizedBox(height: 8),
+                  SkeletonCircle(size: 56),
+                  SizedBox(height: 8),
                   SkeletonBox(width: 52, height: 11, radius: 5),
                 ],
               ),
@@ -287,13 +287,13 @@ class HomeQuickFilterSkeleton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           children: List.generate(4, (_) {
-            return Expanded(
+            return const Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: EdgeInsets.symmetric(horizontal: 4),
                 child: Column(
                   children: [
                     SkeletonBox(width: double.infinity, height: 60, radius: 16),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     SkeletonBox(width: 48, height: 11, radius: 5),
                   ],
                 ),
@@ -345,9 +345,9 @@ class BannerSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer(
+    return const Shimmer(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: SkeletonBox(
           width: double.infinity,
           height: 110,
@@ -382,12 +382,12 @@ class CartItemSkeleton extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image
           SkeletonBox(width: 90, height: 90, radius: 16),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           // Details
           Expanded(
             child: Column(
@@ -399,13 +399,13 @@ class CartItemSkeleton extends StatelessWidget {
                       child: SkeletonBox(
                           width: double.infinity, height: 15, radius: 6),
                     ),
-                    const SizedBox(width: 12),
-                    const SkeletonCircle(size: 24),
+                    SizedBox(width: 12),
+                    SkeletonCircle(size: 24),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 SkeletonBox(width: 80, height: 12, radius: 5),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -450,9 +450,9 @@ class SectionHeaderSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer(
+    return const Shimmer(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
